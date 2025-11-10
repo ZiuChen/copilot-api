@@ -3,6 +3,7 @@ import type { Context, MiddlewareHandler } from "hono"
 import { HTTPException } from "hono/http-exception"
 
 import { state } from "./state"
+import { constantTimeEqual } from "./utils"
 
 /**
  * Extract API key from request headers
@@ -52,7 +53,9 @@ export const apiKeyAuthMiddleware: MiddlewareHandler = async (c, next) => {
   }
 
   // Check if the provided key matches any of the configured keys
-  const isValidKey = state.apiKeys.includes(providedKey)
+  const isValidKey = state.apiKeys.some((key) =>
+    constantTimeEqual(key, providedKey),
+  )
 
   if (!isValidKey) {
     throw new HTTPException(401, {
