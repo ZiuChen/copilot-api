@@ -22,12 +22,6 @@ function extractApiKey(c: Context): string | undefined {
     return anthropicKey
   }
 
-  // Fallback: query parameter, for extra compatibility of `/usage` or `/token` route
-  const queryKey = c.req.query("apiKey")
-  if (queryKey) {
-    return queryKey
-  }
-
   return undefined
 }
 
@@ -47,8 +41,7 @@ export const apiKeyAuthMiddleware: MiddlewareHandler = async (c, next) => {
   // If no API key is provided, return 401
   if (!providedKey) {
     throw new HTTPException(401, {
-      message:
-        "API key required. Please provide a valid API key in the Authorization header (Bearer token) or x-api-key header.",
+      message: "Missing API key",
     })
   }
 
@@ -59,7 +52,7 @@ export const apiKeyAuthMiddleware: MiddlewareHandler = async (c, next) => {
 
   if (!isValidKey) {
     throw new HTTPException(401, {
-      message: "Invalid API key. Please provide a valid API key.",
+      message: "Invalid API key",
     })
   }
 
